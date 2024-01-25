@@ -1,0 +1,42 @@
+package {{ModuleName}}
+
+
+import (
+	"github.com/gogf/gf/v2/frame/g"
+)
+
+type {{UpperToolsName}}ListReq struct {
+	g.Meta   `path:"/{{LowerToolsName}}/list" tags:"{{ModuleName}} {{ToolsName}}" method:"get" summary:"{{ToolsName}}列表"`
+
+	utility.UnitPage
+}
+type {{UpperToolsName}}Form struct {
+	Name     string `json:"name" dc:"名称" v:"required#名称必填"`
+}
+type {{UpperToolsName}}AddReq struct {
+	g.Meta `path:"/{{LowerToolsName}}/add" tags:"{{ModuleName}} {{ToolsName}}" method:"post" summary:"新增{{ToolsName}}"`
+	{{UpperToolsName}}Form
+}
+
+type {{UpperToolsName}}EditReq struct {
+	g.Meta `path:"/{{LowerToolsName}}/edit" tags:"{{ModuleName}} {{ToolsName}}" method:"post" summary:"修改{{ToolsName}}"`
+	Id     int `json:"id" v:"required#ID不能为空|min:1#id参数不能小于0"`
+	{{UpperToolsName}}Form
+}
+type {{UpperToolsName}}DeleteReq struct {
+	g.Meta `path:"/{{LowerToolsName}}/delete" tags:"{{ModuleName}} {{ToolsName}}" method:"post" summary:"删除{{ToolsName}}"`
+	Id     []int `json:"id" v:"required#ID不能为空"`
+}
+type {{UpperToolsName}}LogicDeleteReq struct {
+	g.Meta `path:"/{{LowerToolsName}}/logicDelete" tags:"{{ModuleName}} {{ToolsName}}" method:"post" summary:"逻辑删除{{ToolsName}}"`
+	Id     []int `json:"id" v:"required#ID不能为空"`
+}
+type {{UpperToolsName}}InfoReq struct {
+	g.Meta `path:"/{{LowerToolsName}}/info" tags:"{{ModuleName}} {{ToolsName}}" method:"get" summary:"{{ToolsName}}详情"`
+	Id     int `json:"id" v:"required#ID不能为空|min:1#id参数不能小于0"`
+}
+type {{UpperToolsName}}EnableReq struct {
+	g.Meta `path:"/{{LowerToolsName}}/enable" tags:"{{ModuleName}} {{ToolsName}}" method:"post" summary:"启用/禁用{{ToolsName}}"`
+	Id      []int `json:"id" v:"required#ID不能为空"`
+	Enable int    `json:"enable" dc:"状态"  v:"required|in:1,2#状态必填|状态参数错误"`
+}

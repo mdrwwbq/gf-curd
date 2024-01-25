@@ -1,0 +1,16 @@
+package utility
+import (
+	"context"
+	"github.com/gogf/gf/v2/frame/g"
+)
+// CheckDataExist 检查数据是否存在
+func CheckDataExist(ctx context.Context, table string, where interface{}, caller ... func(ctx context.Context, count int) (bool, error) ) (bool, error) {
+	if count, err := g.Model(table).Where(where).Count(); err != nil {
+		return false, err
+	} else {
+	    if len(caller) > 0 {
+	        return caller[0](ctx, count)
+	    }
+		return count > 0, nil
+	}
+}

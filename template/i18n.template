@@ -1,0 +1,5 @@
+{{UpperModuleName}}{{UpperToolsName}}CodeIsExist="“%v“已经存在"
+{{UpperModuleName}}{{UpperToolsName}}DataIsNotExist="数据不存在id=%v"
+{{UpperModuleName}}{{UpperToolsName}}DeleteDataNumIsNotEqual="删除数据数量:%v与待删除数量:%v不一致"
+{{UpperModuleName}}{{UpperToolsName}}EnabledDataNumIsNotEqual="禁用数据数量:%v与待禁用数量:%v不一致"
+{{UpperModuleName}}{{UpperToolsName}}MultiDeleteIdIsEmpty="批量删除，ID不能为空"

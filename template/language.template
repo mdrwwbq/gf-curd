@@ -1,0 +1,35 @@
+package utility
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/gogf/gf/v2/frame/g"
+)
+
+// L 获得语言包值
+func L(ctx context.Context, key string) string {
+	lStr := g.I18n().T(ctx, key)
+	if lStr == "" {
+		return fmt.Sprintf("not found language:%s", key)
+	}
+	return lStr
+}
+
+// T 动态包语言包 T(ctx, `GF says: {#hello}{#world}!`)) --> GF says: 哈喽世界
+func T(ctx context.Context, content string) string {
+	lStr := g.I18n().Translate(ctx, content)
+	if lStr == "" {
+		return fmt.Sprintf("not found language:%s", content)
+	}
+	return lStr
+}
+
+// Tf 可转换语言包中存在变量 Tf(ctx, `{#hello}`, 张三,李四) -->  hello 张三,李四。  {#hello} --> hello="哈喽#%s,#%s。"
+func Tf(ctx context.Context, format string, values ...interface{}) string {
+	lStr := g.I18n().Tf(ctx, format, values...)
+	if lStr == "" {
+		return fmt.Sprintf("not found language:%s", format)
+	}
+	return lStr
+}

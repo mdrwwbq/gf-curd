@@ -1,0 +1,265 @@
+package {{ToolsName}}
+
+import (
+	"context"
+	"database/sql"
+	"errors"
+	"fmt"
+	"github.com/gogf/gf/v2/database/gdb"
+
+	"github.com/gogf/gf/v2/frame/g"
+)
+
+type (
+	s{{UpperToolsName}} struct{}
+)
+
+func init() {
+	service.Register{{UpperToolsName}}(New())
+}
+
+func New() *s{{UpperToolsName}} {
+	return &s{{UpperToolsName}}{}
+}
+// table 获得当前功能表名
+func (s *s{{UpperToolsName}}) table() string {
+    // todo write specific table here
+    return "manual_changes_table_name"
+}
+// model 获得当前功能Model
+func (s *s{{UpperToolsName}}) model() *gdb.Model {
+    return g.Model(s.table())
+}
+// getPrimaryKey 获得表自增ID字段
+func (s *s{{UpperToolsName}}) getPrimaryKeyField() string {
+	// todo write specific table primary key here
+	return "id"
+}
+
+// getLogicDeleteField 获得表逻辑删除字段
+func (s *s{{UpperToolsName}}) getLogicDeleteField() string {
+	// todo write specific table logic delete field here
+	return "is_del"
+}
+
+// getLogicDeleteField 获得表启用/禁用字段
+func (s *s{{UpperToolsName}}) getEnableField() string {
+	// todo write specific table enabled field  here
+	return "enable"
+}
+// List {{ToolsName}}列表
+func (s *s{{UpperToolsName}}) List(ctx context.Context) (list []*entity.{{UpperToolsName}}, page *utility.UnitPageRes, err error) {
+	var (
+		r  = g.RequestFromCtx(ctx)
+		in {{ModuleName}}.{{UpperToolsName}}ListReq
+	)
+	if err := r.Parse(&in); err != nil {
+		return nil, nil, err
+	}
+
+	list = make([]*entity.{{UpperToolsName}}, 0)
+	model := s.model().Ctx(ctx)
+	// 统计数量
+	if total, err := model.Count(); err != nil {
+		return nil, nil, err
+	} else {
+        // 生成分页
+        page = utility.GetPage(ctx, in.CurrentPage, in.PerPage, total)
+        // 查询数据
+        if err = model.Page(page.CurrentPage, page.PerPage).OrderDesc(s.getPrimaryKeyField()).Scan(&list); err != nil && !errors.Is(err, sql.ErrNoRows) {
+            return nil, nil, err
+        }
+        return list, page, nil
+	}
+}
+
+// Add 新增{{ToolsName}}
+func (s *s{{UpperToolsName}}) Add(ctx context.Context) (err error) {
+	var (
+		r  = g.RequestFromCtx(ctx)
+		in {{ModuleName}}.{{UpperToolsName}}AddReq
+	)
+	if err := r.Parse(&in); err != nil {
+		return nil
+	}
+	// check name is exists
+	exist, err := utility.CheckDataExist(ctx, s.table(), g.Map{
+		"name": in.Name,
+	})
+	if err != nil {
+		return err
+	}
+	// data is exists
+	if exist {
+		return errors.New(utility.Tf(ctx, `{#{{UpperModuleName}}{{UpperToolsName}}CodeIsExist}`, in.Name))
+	}
+	data := g.Map{
+	    "name": in.Name,
+	    // todo write specific data struct logic here
+	}
+	// inert data to table
+    _, err = s.model().Ctx(ctx).Data(data).Insert()
+	return err
+}
+
+// Edit 修改{{ToolsName}}
+func (s *s{{UpperToolsName}}) Edit(ctx context.Context) (err error) {
+	var (
+		r  = g.RequestFromCtx(ctx)
+		in {{ModuleName}}.{{UpperToolsName}}EditReq
+	)
+	if err := r.Parse(&in); err != nil {
+		return nil
+	}
+	// check data is exists
+	info, err := s.Get(ctx, g.Map{
+		s.getPrimaryKeyField(): in.Id,
+	})
+	if err != nil {
+		return err
+	}
+	if info.Id <= 0 {
+		return errors.New(utility.Tf(ctx, `{#{{UpperModuleName}}{{UpperToolsName}}DataIsNotExist}`, in.Id))
+	}
+	// check data is exists
+	exist, err := utility.CheckDataExist(ctx, s.table(), g.Map{
+		"name":                     in.Name,
+		fmt.Sprintf(`%s !=`, s.getPrimaryKeyField()): in.Id,
+	})
+	if err != nil {
+		return err
+	}
+	// is exists
+	if exist {
+		return errors.New(utility.Tf(ctx, `{#{{UpperModuleName}}{{UpperToolsName}}CodeIsExist}`, in.Name))
+	}
+
+	data := g.Map{
+	    "name": in.Name,
+		//dao.LisMenu.Columns().Name: in.Name,
+		// todo write specific data struct logic here
+	}
+	_, err = s.model().Where(s.getPrimaryKeyField(), in.Id).Data(data).Update()
+	return err
+}
+
+// Delete 删除{{ToolsName}}
+func (s *s{{UpperToolsName}}) Delete(ctx context.Context) (err error) {
+	var (
+		r  = g.RequestFromCtx(ctx)
+		in {{ModuleName}}.{{UpperToolsName}}DeleteReq
+	)
+	if err := r.Parse(&in); err != nil {
+		return nil
+	}
+    // check data is exists
+    _, err = utility.CheckDataExist(ctx, s.table(), g.Map{
+        s.getPrimaryKeyField(): in.Id,
+    }, func(ctx context.Context, count int) (bool, error) {
+        if count != len(in.Id) {
+            return false, errors.New(utility.Tf(ctx, `{#BasicUserDeleteDataNumIsNotEqual}`, count, len(in.Id)))
+        }
+        return true, nil
+    })
+    if err != nil {
+        return err
+    }
+	_, err = s.model().WhereIn(s.getPrimaryKeyField(), in.Id).Delete()
+	return err
+}
+// LogicDelete 逻辑删除{{ToolsName}}
+func (s *s{{UpperToolsName}}) LogicDelete(ctx context.Context) (err error) {
+	var (
+		r  = g.RequestFromCtx(ctx)
+		in {{ModuleName}}.{{UpperToolsName}}DeleteReq
+	)
+	if err := r.Parse(&in); err != nil {
+		return nil
+	}
+	// check data is exists
+    _, err = utility.CheckDataExist(ctx, s.table(), g.Map{
+        s.getPrimaryKeyField(): in.Id,
+        s.getLogicDeleteField(): utility.Normal,
+    }, func(ctx context.Context, count int) (bool, error) {
+        if count != len(in.Id) {
+            return false, errors.New(utility.Tf(ctx, `{#BasicUserDeleteDataNumIsNotEqual}`, count, len(in.Id)))
+        }
+        return true, nil
+    })
+    if err != nil {
+        return err
+    }
+	_, err = s.model().WhereIn(s.getPrimaryKeyField(), in.Id).Data(g.Map{
+	    s.getLogicDeleteField(): utility.IsDel,
+	}).Update()
+	return err
+}
+
+// Enable 启用/禁用{{ToolsName}}
+func (s *s{{UpperToolsName}}) Enable(ctx context.Context) error {
+	var (
+		r  = g.RequestFromCtx(ctx)
+		in {{ModuleName}}.{{UpperToolsName}}EnableReq
+	)
+	if err := r.Parse(&in); err != nil {
+		return err
+	}
+	// check data is exists
+	_, err := utility.CheckDataExist(ctx, s.table(), g.Map{
+		s.getPrimaryKeyField(): in.Id,
+		s.getEnableField():    utility.Enable,
+	}, func(ctx context.Context, count int) (bool, error) {
+		if count != len(in.Id) {
+			return false, errors.New(utility.Tf(ctx, `{#BasicUserEnabledDataNumIsNotEqual}`, count, len(in.Id)))
+		}
+		return true, nil
+	})
+	if err != nil {
+		return err
+	}
+	_, err = s.model().WhereIn(s.getPrimaryKeyField(), in.Id).Data(g.Map{
+		s.getEnableField(): utility.IsDel,
+	}).Update()
+	return err
+}
+
+// Info {{ToolsName}}详情
+func (s *s{{UpperToolsName}}) Info(ctx context.Context) (res *entity.{{UpperToolsName}}, err error) {
+	var (
+		r  = g.RequestFromCtx(ctx)
+		in {{ModuleName}}.{{UpperToolsName}}InfoReq
+	)
+	if err := r.Parse(&in); err != nil {
+		return nil, err
+	}
+	info, err := s.Get(ctx, g.Map{
+		s.getPrimaryKeyField(): in.Id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if info.Id <= 0 {
+		return nil, errors.New(utility.Tf(ctx, `{#BasicUserDataIsNotExist}`, in.Id))
+	}
+	return info, nil
+}
+// Get 查询一条数据
+func (s *s{{UpperToolsName}}) Get(ctx context.Context, where interface{}) (res *entity.{{UpperToolsName}}, err error) {
+	res = &entity.{{UpperToolsName}}{}
+	err = s.model().Ctx(ctx).Where(where).Limit(1).Scan(&res)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	return res, nil
+}
+
+// GetList 获得指定条件的多条数据
+func (s *s{{UpperToolsName}}) GetList(ctx context.Context, where interface{}) (res []*entity.{{UpperToolsName}}, err error) {
+    // todo write logic here
+	res = make([]*entity.{{UpperToolsName}}, 0)
+	err = s.model().Ctx(ctx).Where(where).Scan(&res)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	return res, nil
+}

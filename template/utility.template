@@ -1,0 +1,116 @@
+package utility
+
+import (
+	"context"
+	"math"
+	"reflect"
+	"github.com/gogf/gf/v2/frame/g"
+)
+
+// UnitPage 分页
+type UnitPage struct {
+	CurrentPage int `json:"currentPage" dc:"页码" d:"1"`
+	PerPage     int `json:"perPage" dc:"每页数据条数" d:"20"`
+}
+
+// UnitPageRes 分页工具条
+type UnitPageRes struct {
+	UnitPage
+	Total    int    `json:"total" dc:"总条数"`
+	LastPage int    `json:"lastPage" dc:"总页数"`
+	PageBar  string `json:"pageBar"`
+}
+
+// UnitRes 通用的http响应
+type UnitRes struct {
+	Code      int         `json:"code" d:"200"`
+	Data      interface{} `json:"data"`
+	Message   string      `json:"message"`
+	RequestId string      `json:"requestId"`
+}
+
+// UnitDataPageRes 分页数据通用返回
+type UnitDataPageRes struct {
+	UnitPageRes
+	Data interface{} `json:"data"`
+}
+
+// GetPage 获得数据分页
+// page 页码
+// limit 每页条数
+// total 数据总数
+func GetPage(ctx context.Context, page, size, total int) *UnitPageRes {
+	p := &UnitPageRes{}
+	if page >= 1 {
+		p.CurrentPage = page
+	} else {
+		p.CurrentPage = 1
+	}
+	if size >= 1 {
+		p.PerPage = size
+	} else {
+		p.PerPage = 20
+	}
+	p.Total = 1
+	p.LastPage = 1
+
+	if total > p.PerPage {
+		p.LastPage = int(math.Ceil(float64(total) / float64(p.PerPage)))
+	}
+	p.Total = total
+	p.PageBar = g.RequestFromCtx(ctx).GetPage(p.Total, p.PerPage).GetContent(1)
+	return p
+}
+// ResponseTo 通用数据返回
+func ResponseTo(code int, data interface{}, message ...string) *UnitRes {
+	defaultMsg := "操作成功"
+	// 处理数据，如果interface{} == nil
+	if data != nil {
+		if reflect.TypeOf(data).Kind() == reflect.Slice {
+			s := reflect.ValueOf(data)
+			if s.Len() == 0 {
+				data = make([]string, 0)
+			}
+		}
+	} else {
+		data = make(map[string]interface{})
+	}
+	if len(message) == 1 {
+		defaultMsg = message[0]
+	}
+	return &UnitRes{
+		Code:      code,
+		Data:      data,
+		Message:   defaultMsg,
+		RequestId: "", // 为空就行，因为，根据请求链路，最终会打到response_middleware的Response上
+	}
+}
+
+// ResponsePageTo 通用分页数据处理
+func ResponsePageTo(code int, data interface{}, page *UnitPageRes, message ...string) *UnitRes {
+	defaultMsg := "操作成功"
+	if len(message) == 1 {
+		defaultMsg = message[0]
+	}
+	dataMap := &UnitDataPageRes{}
+	// 处理数据
+	dataMap.Data = data
+	dataMap.PerPage = page.PerPage
+	dataMap.CurrentPage = page.CurrentPage
+	dataMap.Total = page.Total
+	dataMap.LastPage = page.LastPage
+	dataMap.PageBar = page.PageBar
+	// 如果是g.Map需要遍历Map中的值压入dataMap中，将其Key转换为小写
+	if reflect.TypeOf(data).Kind() == reflect.Slice {
+		s := reflect.ValueOf(data)
+		if s.Len() == 0 {
+			dataMap.Data = make([]string, 0)
+		}
+	}
+	return &UnitRes{
+		Code:      code,
+		Data:      dataMap,
+		Message:   defaultMsg,
+		RequestId: "", // 为空就行，因为，根据请求链路，最终会打到response_middleware的Response上
+	}
+}

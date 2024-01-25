@@ -1,0 +1,77 @@
+package {{PACKAGE}}
+
+import (
+	"context"
+
+	"github.com/gogf/gf/v2/frame/g"
+)
+
+var (
+	{{UpperToolsName}} = c{{UpperToolsName}}{}
+)
+
+type c{{UpperToolsName}} struct {
+}
+
+// List {{ToolsName}}列表
+func (c *c{{UpperToolsName}}) List(ctx context.Context, req *{{ModuleName}}.{{UpperToolsName}}ListReq) (res *utility.UnitRes, err error) {
+	list, page, err := service.{{UpperToolsName}}().List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utility.ResponsePageTo(0, list, page, utility.L(ctx, `Success`)), nil
+}
+
+// Add 新增{{ToolsName}}
+func (c *c{{UpperToolsName}}) Add(ctx context.Context, req *{{ModuleName}}.{{UpperToolsName}}AddReq) (res *utility.UnitRes, err error) {
+	err = service.{{UpperToolsName}}().Add(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utility.ResponseTo(0, nil, utility.L(ctx, `Success`)), nil
+}
+
+// Edit 修改{{ToolsName}}
+func (c *c{{UpperToolsName}}) Edit(ctx context.Context, req *{{ModuleName}}.{{UpperToolsName}}EditReq) (res *utility.UnitRes, err error) {
+	err = service.{{UpperToolsName}}().Edit(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utility.ResponseTo(0, nil, utility.L(ctx, `Success`)), nil
+}
+
+// Delete 删除{{ToolsName}}
+func (c *c{{UpperToolsName}}) Delete(ctx context.Context, req *{{ModuleName}}.{{UpperToolsName}}DeleteReq) (res *utility.UnitRes, err error) {
+	err = service.{{UpperToolsName}}().Delete(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utility.ResponseTo(0, nil, utility.L(ctx, `Success`)), nil
+}
+
+// LogicDelete 逻辑删除{{ToolsName}}
+func (c *c{{UpperToolsName}}) LogicDelete(ctx context.Context, req *{{ModuleName}}.{{UpperToolsName}}LogicDeleteReq) (res *utility.UnitRes, err error) {
+	err = service.{{UpperToolsName}}().LogicDelete(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utility.ResponseTo(0, nil, utility.L(ctx, `Success`)), nil
+}
+
+// Info {{ToolsName}}详情
+func (c *c{{UpperToolsName}}) Info(ctx context.Context, req *{{ModuleName}}.{{UpperToolsName}}InfoReq) (res *utility.UnitRes, err error) {
+	info, err := service.{{UpperToolsName}}().Info(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utility.ResponseTo(0, info, utility.L(ctx, `Success`)), nil
+}
+
+// Enable 启用/禁用{{ToolsName}}
+func (c *c{{UpperToolsName}}) Enable(ctx context.Context, req *{{ModuleName}}.{{UpperToolsName}}EnableReq) (res *utility.UnitRes, err error) {
+	err = service.{{UpperToolsName}}().Enable(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return utility.ResponseTo(0, nil, utility.L(ctx, `Success`)), nil
+}
