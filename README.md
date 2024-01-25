@@ -16,6 +16,7 @@ gf curd tools
 go install github.com/mdrwwbq/gf-curd@latest
 ```
 ### 怎么使用
+[参见文档](https://github.com/mdrwwbq/how-to-user.md)
 ```
 gf-curd --help
 Usage of gfcurd.exe:
@@ -28,4 +29,9 @@ Usage of gfcurd.exe:
         具体功能名，如：-t menu或-t userRole
 ```
 
+### 一些参数约定
+- `{{ModuleName}}`原始的模块名,如果未指定`{{ModuleName}}`，在`api`目录中将使用默认的`v1`目录
+- `{{TooleName}}`原始的功能名
+- `{{UpperToolsName}}`功能名大陀峰
+- `{{UpperToolsName}}`功能名小陀峰
 
