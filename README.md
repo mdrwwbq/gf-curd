@@ -16,7 +16,7 @@ gf curd tools
 go install github.com/mdrwwbq/gf-curd@latest
 ```
 ### 怎么使用
-[参见文档](https://github.com/mdrwwbq/how-to-user.md)
+[参见文档](https://github.com/mdrwwbq/gf-curd/blob/main/how-to-user.md)
 ```
 gf-curd --help
 Usage of gfcurd.exe:
