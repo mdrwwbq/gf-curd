@@ -37,6 +37,8 @@ func (h *Handle) Run() {
 		os.Exit(0)
 		//log.Fatal("参数-t 不能为空")
 	}
+	// 初始化模板文件
+
 	// 初始化目录
 	h.initDir()
 	// 写API文件
@@ -231,8 +233,14 @@ func (h *Handle) getSnakeModuleName() string {
 
 // getTemplate 获得指定模板文件内容
 func (h *Handle) getTemplate(path string) (string, error) {
+
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return "", errors.New(fmt.Sprintf("“%s”文件不存在", path))
+		con := GetDefaultTemplateContent(path)
+		if len(con) == 0 {
+			return "", errors.New(fmt.Sprintf(`模板文件“%s”内容为空，或模板文件不存在`, path))
+		}
+		return GetDefaultTemplateContent(path), nil
+		// return "", errors.New(fmt.Sprintf("“%s”文件不存在", path))
 	}
 	contentByte, err := os.ReadFile(path)
 	if err != nil {

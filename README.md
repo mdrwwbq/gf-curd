@@ -11,9 +11,13 @@ gf curd tools
 - [x] logicDelete（逻辑删除单个/多个）
 - [x] enable（启用/禁用单个/多个）
 
+### 如何安装
+```
+go install github.com/mdrwwbq/gf-curd@latest
+```
 ### 怎么使用
 ```
-gfcurd --help
+gf-curd --help
 Usage of gfcurd.exe:
   -c    覆盖写入，如：-c true覆盖（默认），-c=false不覆盖 (default true)
   -m string

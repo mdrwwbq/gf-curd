@@ -21,6 +21,7 @@ func init() {
 }
 func main() {
 	flag.Parse()
+
 	ctx := context.TODO()
 	h := src.NewHandle(ctx)
 	h.ModuleName = moduleName
